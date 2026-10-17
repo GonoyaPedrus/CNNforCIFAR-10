@@ -20,7 +20,7 @@ x_test = x_test / 255.0
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
-# Architecture inspirée d'AlexNet pour des images de taille 32x32
+# Architecture inspirée d'InceptionV1 (tronc GoogLeNet, sans modules Inception) pour des images de taille 32x32
 input_layer = Input(shape=(32, 32, 3))
 x = Conv2D(64, (7, 7), strides=(2, 2), padding='same', activation='relu')(input_layer)
 x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
@@ -76,6 +76,6 @@ plt.show()
 
 
 
-model.save('alexnet_like.h5')
+model.save('inception_like.h5')
 
 

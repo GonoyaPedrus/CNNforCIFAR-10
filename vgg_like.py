@@ -69,7 +69,7 @@ model.compile(optimizer='adam',
 loss='sparse_categorical_crossentropy',
 metrics=['accuracy'])
 
-r = model.fit(
+r1 = model.fit(
 x_train, y_train, validation_data=(x_val, y_val), epochs=50)
 
 batch_size = 1024 #nbre d'images pour chaque itération
@@ -79,11 +79,14 @@ width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
 train_generator = data_generator.flow(x_train, y_train, batch_size)
 steps_per_epoch = x_train.shape[0] // batch_size
 
-r = model.fit(train_generator, validation_data=(x_val, y_val),
+r2 = model.fit(train_generator, validation_data=(x_val, y_val),
 steps_per_epoch=steps_per_epoch, epochs=50)
 
-plt.plot(r.history['accuracy'], label='acc', color='red')
-plt.plot(r.history['val_accuracy'], label='val_acc', color='green')
+model.save('vgg_like.h5')
+
+# Courbes sur les deux phases d'entraînement (sans puis avec augmentation)
+plt.plot(r1.history['accuracy'] + r2.history['accuracy'], label='acc', color='red')
+plt.plot(r1.history['val_accuracy'] + r2.history['val_accuracy'], label='val_acc', color='green')
 plt.legend()
 plt.show()
 
@@ -103,8 +106,6 @@ original_label = labels[y_test[image_number]]
 
 print("Original label is {} and predicted label is {}".format(
 original_label, predicted_label))
-
-model.save('vgg_like.h5')
 
 #tracer graphe de toutes les métriques
 # Calcul de la matrice de confusion sur le jeu de test
