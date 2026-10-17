@@ -1,0 +1,12 @@
+# Dataset (téléchargé automatiquement par Keras)
+cifar-10-batches-py/
+
+# Modèles entraînés
+*.h5
+*.keras
+
+# IDE et environnement
+.idea/
+.vscode/
+__pycache__/
+.venv/
