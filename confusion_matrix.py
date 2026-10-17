@@ -3,10 +3,10 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 import matplotlib.pyplot as plt
 
-classes = '''airplane automobile bird cat deerdog frog horseship truck'''.split()
+classes = '''airplane automobile bird cat deer dog frog horse ship truck'''.split()
 
-# Charger le modèle à partir d'un fichier h5
-model = tf.keras.models.load_model('modeltest.h5')
+# Charger le modèle entraîné par vgg_like.py
+model = tf.keras.models.load_model('vgg_like.h5')
 
 # Load in the data
 cifar10 = tf.keras.datasets.cifar10
@@ -25,8 +25,8 @@ y_train, y_test = y_train.flatten(), y_test.flatten()
 y_pred = model.predict(x_test)
 
 # Convertir les probabilités en étiquettes de classe
-y_pred_classes = np.argmax(y_pred)
-y_test_classes = np.argmax(y_test)
+y_pred_classes = np.argmax(y_pred, axis=1)
+y_test_classes = y_test
 
 # Calculer la matrice de confusion
 confusion_mtx = confusion_matrix(y_test_classes, y_pred_classes)

@@ -16,6 +16,10 @@ x_train, x_test = x_train / 255.0, x_test / 255.0
 
 y_train, y_test = y_train.flatten(), y_test.flatten()
 
+# Jeu de validation séparé du jeu de test (les 5 000 dernières images d'entraînement)
+x_train, x_val = x_train[:-5000], x_train[-5000:]
+y_train, y_val = y_train[:-5000], y_train[-5000:]
+
 fig, ax = plt.subplots(5, 5)
 k = 0
 
@@ -65,8 +69,8 @@ model.compile(optimizer='adam',
 loss='sparse_categorical_crossentropy',
 metrics=['accuracy'])
 
-r = model.fit(
-x_train, y_train, validation_data=(x_test, y_test), epochs=50)
+r1 = model.fit(
+x_train, y_train, validation_data=(x_val, y_val), epochs=50)
 
 batch_size = 1024 #nbre d'images pour chaque itération
 data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -75,12 +79,16 @@ width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
 train_generator = data_generator.flow(x_train, y_train, batch_size)
 steps_per_epoch = x_train.shape[0] // batch_size
 
-r = model.fit(train_generator, validation_data=(x_test, y_test),
+r2 = model.fit(train_generator, validation_data=(x_val, y_val),
 steps_per_epoch=steps_per_epoch, epochs=50)
 
-plt.plot(r.history['accuracy'], label='acc', color='red')
-plt.plot(r.history['val_accuracy'], label='val_acc', color='green')
+model.save('vgg_like.h5')
+
+# Courbes sur les deux phases d'entraînement (sans puis avec augmentation)
+plt.plot(r1.history['accuracy'] + r2.history['accuracy'], label='acc', color='red')
+plt.plot(r1.history['val_accuracy'] + r2.history['val_accuracy'], label='val_acc', color='green')
 plt.legend()
+plt.show()
 
 labels = '''airplane automobile bird cat deer dog frog horse ship truck'''.split()
 
@@ -99,11 +107,10 @@ original_label = labels[y_test[image_number]]
 print("Original label is {} and predicted label is {}".format(
 original_label, predicted_label))
 
-model.save('modeltest.h5')
-
 #tracer graphe de toutes les métriques
-# Calcul de la matrice de confusion
-cm = confusion_matrix(y_train, y_test)
+# Calcul de la matrice de confusion sur le jeu de test
+y_pred_classes = model.predict(x_test).argmax(axis=1)
+cm = confusion_matrix(y_test, y_pred_classes)
 
 # Affichage de la matrice de confusion
 plt.matshow(cm, cmap='Blues')
